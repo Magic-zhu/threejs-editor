@@ -7,7 +7,7 @@
       <div class="right-panel"></div>
     </div>
     <div class="status-bar">
-      <div class="version">{{version}}</div>
+      <div class="version">version {{version}}</div>
     </div>
   </div>
 </template>
@@ -16,8 +16,16 @@ import { defineComponent, onMounted } from "vue";
 //@ts-ignore
 import * as THREE from "three";
 import { OrbitControls } from '@three-ts/orbit-controls';
-
+import Loader from './schedule/loader';
+import {Object3D} from "three";
 export default defineComponent({
+  props:{
+    // * 整个编辑器的初始化配置项
+    config:{
+      type:Object,
+      default:()=>({}),
+    },
+  },
   setup() {
     // * 场景对象
     const scene = new THREE.Scene();
@@ -26,7 +34,7 @@ export default defineComponent({
     // * 相机
     const camera = new THREE.PerspectiveCamera(
         60,
-        1200/700,
+        1,
         0.01,
         100,
     );
@@ -35,9 +43,11 @@ export default defineComponent({
     // * 控制器
     const controls = new OrbitControls(camera,renderer.domElement);
     // * 初始化
-    const init = () =>{
+    const init = async () =>{
       const content = document.getElementsByClassName('content')[0];
       scene.add(gridHelper);
+      const tree:Object3D = await new Loader('/models/tree.obj','obj').loadModel()
+      scene.add(tree)
       // * 相机参数设置
       camera.position.set(8, 8, 8); //设置相机位置
       camera.lookAt(scene.position);

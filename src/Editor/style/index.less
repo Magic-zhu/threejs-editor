@@ -1,27 +1,32 @@
-#editor{
+#editor {
   width: 100%;
   height: 100%;
   background: #000000;
   color: white;
   display: flex;
   flex-direction: column;
+
   .header {
     width: 100%;
     height: 30px;
   }
-  .body{
+
+  .body {
     width: 100%;
-    flex:1;
+    flex: 1;
     display: flex;
-    .left-panel{
+
+    .left-panel {
       width: 300px;
       height: 100%;
     }
+
     .content {
-      flex:1;
+      flex: 1;
       height: 100%;
     }
-    .right-panel{
+
+    .right-panel {
       width: 300px;
       height: 100%;
     }
@@ -30,12 +35,16 @@
   .status-bar {
     width: 100%;
     height: 30px;
+    position: relative;
+
     .version {
-      width: 50px;
+      width: 150px;
       height: 100%;
       display: flex;
-     align-items: center;
+      align-items: center;
       justify-content: center;
+      position: absolute;
+      right: 10px;
     }
   }
 }

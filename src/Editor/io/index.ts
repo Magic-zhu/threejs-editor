@@ -39,7 +39,7 @@ class IO {
     try {
       listeners.forEach((eventTarget: EventTarget) => {
         eventTarget.handler(...args);
-        if (eventTarget.once === true) {
+        if (eventTarget.once) {
           this.removeListener(eventName, eventTarget.handler);
         }
       });

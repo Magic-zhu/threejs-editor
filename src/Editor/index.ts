@@ -1,7 +1,7 @@
 
-import { Schedule } from './schedule/index'
+import Schedule from './schedule/index'
 
-class Editor {
+export class Editor {
   container: Element;
   schedule: Schedule = new Schedule();
 
@@ -26,5 +26,3 @@ class Editor {
     
   }
 }
-
-export { Editor };

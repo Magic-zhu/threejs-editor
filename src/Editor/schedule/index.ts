@@ -1,39 +1,12 @@
 //@ts-ignore
 import * as THREE from "three";
 import { OrbitControls } from "@three-ts/orbit-controls";
+import { TransformControls } from "three/examples/jsm/controls/TransformControls";
 import Loader from "./loader";
 import { Intersection, Object3D } from "three";
-import { Selector } from "./selector";
-import { Store } from "../data/index";
-export enum TaskType {
-  ''
-}
-export enum TaskStatus {
-  // 就绪
-  'READY'= 'ready',
-  // 运行
-  'RUNNING' = 'running',
-  // 阻塞
-  'WAITING' = 'waiting',
-  // 出错
-  'ERROR' = 'error',
-}
-export interface Task {
-    // 任务id
-    pid:string;
-    // 任务开始时间
-    beginTime: number;
-    // 任务结束时间
-    finishTime: number;
-    // 任务发起时间
-    launchTime: number;
-    // 负载数据
-    payload:any;
-    // 任务类型
-    type:TaskType
-    // 任务状态
-    status:TaskStatus
-}
+import Selector  from "./selector";
+import Store  from "../data/";
+import Task from "./task";
 class Schedule {
   _data:Store= new Store();
   // 代理真实数据仓库 方便监听数据变动
@@ -45,25 +18,34 @@ class Schedule {
   data = new Proxy(this._data,this.dataOnChange);
   taskQueue:Task[] = [];
 
-  async initEditor(container: Element,options:any) {
+  async initEditor(container: Element,options:any = {}) {
     // * 场景对象
     const scene = new THREE.Scene();
     // * 辅助网格
     const gridHelper = new THREE.GridHelper(10, 25);
+    scene.add(gridHelper);
     // * 相机
     const camera = new THREE.PerspectiveCamera(60, 1, 0.01, 100);
     // * 渲染器
     const renderer = new THREE.WebGLRenderer();
-    // * 控制器
+    // * 视角控制器
+    let orbitController
     if(options.OrbitControls!==false){
-      const controls = new OrbitControls(camera, renderer.domElement);
+      orbitController  = new OrbitControls(camera, renderer.domElement);
     }
-    scene.add(gridHelper);
+    // * 拖动控制器
+    const transformController = new TransformControls( camera, renderer.domElement );
+    transformController.addEventListener( 'change', render );
+    transformController.addEventListener( 'dragging-changed', function ( event ) {
+      orbitController.enabled = ! event.value;
+    } );
     const tree: Object3D = await new Loader(
       "/models/tree.obj",
       "obj"
     ).loadModel();
     scene.add(tree);
+    transformController.attach(tree);
+    scene.add(transformController);
     // * 相机参数设置
     camera.position.set(8, 8, 8); //设置相机位置
     camera.lookAt(scene.position);
@@ -82,7 +64,7 @@ class Schedule {
     // * 插入画布
     container.appendChild(renderer.domElement);
     // * 渲染
-    const render = () => {
+    function render(){
       renderer.render(scene, camera);
       // 每帧渲染
       requestAnimationFrame(render);
@@ -121,9 +103,9 @@ class Schedule {
 
   }
 
-  tash_destory() {
+  task_destroy() {
 
   }
 }
 
-export { Schedule };
+export default  Schedule;

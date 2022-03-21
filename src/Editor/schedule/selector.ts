@@ -29,8 +29,7 @@ class Selector {
       return;
     }
     this.raycaster.setFromCamera(this.position, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.objects);
-    return intersects;
+    return this.raycaster.intersectObjects(this.objects);
   }
   clickHandler(event: MouseEvent) {
     const intersects = this.mouseEventPositionHandler(event);
@@ -44,7 +43,7 @@ class Selector {
     document.addEventListener("mousemove", this.mousemoveHandler);
     document.addEventListener("click", this.clickHandler);
   }
-  destory() {
+  destroy() {
     document.removeEventListener('click',this.clickHandler);
     document.removeEventListener('mousemove',this.mousemoveHandler);
   }
@@ -63,4 +62,4 @@ class Selector {
     }
   }
 }
-export { Selector };
+export default Selector;

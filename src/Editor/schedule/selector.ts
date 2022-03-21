@@ -1,13 +1,14 @@
-import { Raycaster, Vector2 } from "three";
+import { Raycaster, Vector2, Camera, Scene, Object3D } from "three";
 class Selector {
-  raycaster: THREE.Raycaster = new Raycaster();
-  position: THREE.Vector2 = new Vector2();
-  INTERSECTED: THREE.Vector2 = new Vector2();
-  camera: THREE.Camera | undefined;
-  scene: THREE.Scene | undefined;
-  objects:THREE.Object3D [] = [];
+  raycaster: Raycaster = new Raycaster();
+  position: Vector2 = new Vector2();
+  INTERSECTED: Vector2 = new Vector2();
+  camera: Camera | undefined;
+  scene: Scene | undefined;
+  objects: Object3D [] = [];
   // * 选取之后的回调
-  callback:Function|undefined = undefined;
+  mouseMoveCallback:Function|undefined = undefined;
+  clickCallback:Function|undefined = undefined;
   /**
    * Creates an instance of Selector.
    * @param {THREE.Camera} camera
@@ -15,42 +16,51 @@ class Selector {
    * @param {THREE.Object3D []} objects - 需要查找的对象合集
    * @memberof Selector
    */
-  constructor(camera: THREE.Camera, scene: THREE.Scene, objects: THREE.Object3D []) {
+  constructor(camera: Camera, scene: Scene, objects: Object3D []) {
     this.camera = camera;
     this.scene = scene;
     this.objects = objects;
     this.init();
   }
-  init() {
-    const mousemoveHandler = (event: MouseEvent) => {
-      this.position.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this.position.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      if (!this.camera || !this.scene) {
-        return;
-      }
-      this.raycaster.setFromCamera(this.position, this.camera);
-      let intersects = this.raycaster.intersectObjects(this.objects);
-      if(this.callback) this.callback(intersects);
-    };
-    const mousedownHandler = (event: MouseEvent) => {
-      this.position.x = (event.clientX / window.innerWidth) * 2 - 1;
-      this.position.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      if (!this.camera || !this.scene) {
-        return;
-      }
-      this.raycaster.setFromCamera(this.position, this.camera);
-      let intersects = this.raycaster.intersectObjects(this.objects);
-      if(this.callback) this.callback(intersects);
+  mouseEventPositionHandler(event: MouseEvent) {
+    this.position.x = (event.clientX / window.innerWidth) * 2 - 1;
+    this.position.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    if (!this.camera || !this.scene) {
+      return;
     }
-    document.addEventListener("mousemove", mousemoveHandler);
-    document.addEventListener("mousedown", mousedownHandler);
+    this.raycaster.setFromCamera(this.position, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.objects);
+    return intersects;
+  }
+  clickHandler(event: MouseEvent) {
+    const intersects = this.mouseEventPositionHandler(event);
+    if(this.mouseMoveCallback) this.mouseMoveCallback(intersects);
+  }
+  mousemoveHandler(event: MouseEvent) {
+    const intersects = this.mouseEventPositionHandler(event);
+    if(this.clickCallback) this.clickCallback(intersects);
+  }
+  init() {
+    document.addEventListener("mousemove", this.mousemoveHandler);
+    document.addEventListener("click", this.clickHandler);
+  }
+  destory() {
+    document.removeEventListener('click',this.clickHandler);
+    document.removeEventListener('mousemove',this.mousemoveHandler);
   }
   /**
    * 设置查询的回调函数
    * @param callback - 回调函数
    */
-  setCallback(callback:Function):void {
-    this.callback = callback;
+  setCallback(type:string,callback:Function):void {
+    switch (type) {
+      case 'click':
+        this.clickCallback = callback;
+        break
+      case 'mousemove':
+        this.mouseMoveCallback = callback;
+        break
+    }
   }
 }
 export { Selector };

@@ -3,8 +3,21 @@ import * as THREE from "three";
 import { OrbitControls } from "@three-ts/orbit-controls";
 import Loader from "./loader";
 import { Intersection, Object3D } from "three";
-import {Selector} from "./selector";
-import {Store} from "../data/index";
+import { Selector } from "./selector";
+import { Store } from "../data/index";
+export enum TaskType {
+  ''
+}
+export enum TaskStatus {
+  // 就绪
+  'READY'= 'ready',
+  // 运行
+  'RUNNING' = 'running',
+  // 阻塞
+  'WAITING' = 'waiting',
+  // 出错
+  'ERROR' = 'error',
+}
 export interface Task {
     // 任务id
     pid:string;
@@ -16,6 +29,10 @@ export interface Task {
     launchTime: number;
     // 负载数据
     payload:any;
+    // 任务类型
+    type:TaskType
+    // 任务状态
+    status:TaskStatus
 }
 class Schedule {
   _data:Store= new Store();
@@ -27,7 +44,8 @@ class Schedule {
   };
   data = new Proxy(this._data,this.dataOnChange);
   taskQueue:Task[] = [];
-  async initEditor(container: Element) {
+
+  async initEditor(container: Element,options:any) {
     // * 场景对象
     const scene = new THREE.Scene();
     // * 辅助网格
@@ -37,7 +55,9 @@ class Schedule {
     // * 渲染器
     const renderer = new THREE.WebGLRenderer();
     // * 控制器
-    const controls = new OrbitControls(camera, renderer.domElement);
+    if(options.OrbitControls!==false){
+      const controls = new OrbitControls(camera, renderer.domElement);
+    }
     scene.add(gridHelper);
     const tree: Object3D = await new Loader(
       "/models/tree.obj",
@@ -50,7 +70,7 @@ class Schedule {
     camera.aspect = container.clientWidth / container.clientHeight;
     // * 选择器
     const selector = new Selector(camera, scene, [tree]);
-    selector.setCallback((results: Intersection[]) => {
+    selector.setCallback('mousemove',(results: Intersection[]) => {
       if (results.length > 0) {
         console.log(results[0].object);
         results[0].object.position.x = 0.5

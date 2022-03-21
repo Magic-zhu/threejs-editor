@@ -34,6 +34,7 @@ export default defineComponent({
     onMounted(() => {
       const content: Element = document.getElementsByClassName("content")[0];
       editor = new Editor(content);
+      editor.loadFile('',)
     });
     return {
       version: "1.0.0",

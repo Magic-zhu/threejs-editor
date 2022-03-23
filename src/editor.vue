@@ -18,8 +18,9 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
-import { Editor } from "./Editor/index";
+import {defineComponent, onMounted} from "vue";
+import Editor from "./Editor/index"
+
 export default defineComponent({
   props: {
     // * 整个编辑器的初始化配置项
@@ -29,12 +30,22 @@ export default defineComponent({
     },
   },
   setup() {
-
-    let editor;
-    onMounted(() => {
+    onMounted(async () => {
       const content: Element = document.getElementsByClassName("content")[0];
-      editor = new Editor(content);
-      editor.loadFile('',)
+      const editor = new Editor(content);
+      const tree = await editor.file.load('/models/tree.obj', 'obj');
+      const vtk = await editor.file.load('/models/liver.vtk', 'vtk');
+      const tokyo = await editor.file.load('/models/LittlestTokyo.glb', 'gltf');
+      vtk.self.scale.multiplyScalar(0.01);
+      tokyo.self.position.set(1.1,1.1,0);
+      tokyo.self.scale.set(0.01,0.01,0.01);
+      editor.model.add(tree.self);
+      editor.model.add(vtk.self);
+      editor.model.add(tokyo.self);
+      setTimeout(() => {
+        editor.model.remove(tree.self);
+      }, 2000)
+      window.editor = editor;
     });
     return {
       version: "1.0.0",

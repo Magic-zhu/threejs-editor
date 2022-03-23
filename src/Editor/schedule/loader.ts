@@ -6,7 +6,9 @@ import {FBXLoader} from 'three/examples/jsm/loaders/FBXLoader.js';
 import {ColladaLoader} from 'three/examples/jsm/loaders/ColladaLoader.js';
 import {PLYLoader} from 'three/examples/jsm/loaders/PLYLoader.js';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
-import {Object3D} from "three";
+import {VTKLoader} from 'three/examples/jsm/loaders/VTKLoader.js';
+import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader.js';
+import Model from "./model";
 export enum  ModelType{
     'stl'= 'stl',
     'obj'= 'obj',
@@ -15,41 +17,24 @@ export enum  ModelType{
     'collada'= 'collada',
     'ply'= 'ply',
     'gltf'= 'gltf',
+    'vtk' = 'vtk'
+}
+export const loaderMap:any = {
+    'obj': OBJLoader,
+    'stl': STLLoader,
+    'mtl': MTLLoader,
+    'fbx': FBXLoader,
+    'collada': ColladaLoader,
+    'ply': PLYLoader,
+    'gltf': GLTFLoader,
+    'vtk': VTKLoader,
+    'dracol': DRACOLoader,
 }
 class Loader {
-    constructor(
-        path:string,
-        type: ModelType|string
-    ) {
-        this.path = path
-    }
-    path = ''
-    type:ModelType|string = ModelType.obj
-    _Obj_3D:Object3D|null = null
-    loaderMap:any = {
-        'obj': OBJLoader,
-        'stl': STLLoader,
-        'mtl': MTLLoader,
-        'fbx': FBXLoader,
-        'collada': ColladaLoader,
-        'ply': PLYLoader,
-        'gltf': GLTFLoader,
-    }
-    /**
-     * 加载模型文件
-     * @param path - 路径
-     * @param type - 模型文件类型
-     */
-    async loadModel(path?: string, type?: ModelType|string):Promise<Object3D> {
-        let _path:string = path || this.path;
-        let _type:string = type || this.type;
-        const loader = new this.loaderMap[_type]();
-        return await new Promise((resolve => {
-            loader.load(_path,(obj:Object3D)=>{
-                this._Obj_3D = obj
-                resolve(obj)
-            })
-        }))
+    async load(path:string,type: ModelType|string):Promise<Model>{
+        const model = new Model(path,type);
+        await model.init()
+        return model
     }
 }
 

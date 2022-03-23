@@ -23,6 +23,7 @@ class Selector {
     this.init();
   }
   mouseEventPositionHandler(event: MouseEvent) {
+    // 世界坐标转成屏幕坐标
     this.position.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.position.y = -(event.clientY / window.innerHeight) * 2 + 1;
     if (!this.camera || !this.scene) {
@@ -33,15 +34,15 @@ class Selector {
   }
   clickHandler(event: MouseEvent) {
     const intersects = this.mouseEventPositionHandler(event);
-    if(this.mouseMoveCallback) this.mouseMoveCallback(intersects);
+    if(this.clickCallback) this.clickCallback(intersects);
   }
   mousemoveHandler(event: MouseEvent) {
     const intersects = this.mouseEventPositionHandler(event);
-    if(this.clickCallback) this.clickCallback(intersects);
+    if(this.mouseMoveCallback) this.mouseMoveCallback(intersects);
   }
   init() {
-    document.addEventListener("mousemove", this.mousemoveHandler);
-    document.addEventListener("click", this.clickHandler);
+    document.addEventListener("mousemove", (event)=>{this.mousemoveHandler(event)});
+    document.addEventListener("click", (event)=>{this.clickHandler(event)});
   }
   destroy() {
     document.removeEventListener('click',this.clickHandler);
@@ -49,9 +50,10 @@ class Selector {
   }
   /**
    * 设置查询的回调函数
+   * @param type - 事件类型
    * @param callback - 回调函数
    */
-  setCallback(type:string,callback:Function):void {
+  setCallback(type:string,callback:Function):this {
     switch (type) {
       case 'click':
         this.clickCallback = callback;
@@ -60,6 +62,7 @@ class Selector {
         this.mouseMoveCallback = callback;
         break
     }
+    return this
   }
 }
 export default Selector;

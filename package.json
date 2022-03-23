@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@three-ts/orbit-controls": "^1.4.7",
+    "chalk-web": "^1.0.0",
     "three": "^0.138.3",
     "vue": "^3.2.25"
   },

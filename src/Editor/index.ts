@@ -30,7 +30,7 @@ class Editor {
     }
 
     private init(container: Element) {
-        this.schedule.initEditor(container);
+        this.schedule.init(container);
     }
 
     private async loadFile(path: string, type: ModelType | string):Promise<Model> {

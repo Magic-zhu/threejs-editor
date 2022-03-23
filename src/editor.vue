@@ -37,8 +37,9 @@ export default defineComponent({
       const vtk = await editor.file.load('/models/liver.vtk', 'vtk');
       const tokyo = await editor.file.load('/models/LittlestTokyo.glb', 'gltf');
       vtk.self.scale.multiplyScalar(0.01);
-      tokyo.self.position.set(1.1,1.1,0);
-      tokyo.self.scale.set(0.01,0.01,0.01);
+      tokyo.self.position.set(-5,0,0);
+      tokyo.self.scale.set(0.1,0.1,0.1);
+      vtk.self.position.set(0,0,-2.5);
       editor.model.add(tree.self);
       editor.model.add(vtk.self);
       editor.model.add(tokyo.self);

@@ -1,6 +1,6 @@
 //@ts-ignore
 import * as THREE from "three";
-import {Color, Intersection, Object3D, AmbientLight} from "three";
+import {Color, Intersection, Object3D, AmbientLight,Raycaster} from "three";
 import {OrbitControls} from "@three-ts/orbit-controls";
 import Loader, {ModelType} from "./loader";
 import Selector from "./selector";
@@ -8,7 +8,6 @@ import Store from "../data/";
 import Task, {TaskType} from "./task";
 import Model from './model'
 import {findIndex} from '../util'
-
 
 interface Options {
     backgroundColor?: Color
@@ -21,15 +20,35 @@ class Schedule {
     data: Store = new Proxy(this._data, this._data.dataOnChange());
     file = new Loader();
     taskQueue: Task[] = [];
+    INTERSECTED:any = undefined;
 
-    initEditor(container: Element, options: Options = {}) {
+    init(container: Element, options: Options = {}) {
         // * 场景对象
         const scene = new THREE.Scene();
+
+        const geometry = new THREE.BoxGeometry( 20, 20, 20 );
+
+        for ( let i = 0; i < 10; i ++ ) {
+
+            const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x000000 } ) );
+
+            object.position.x = Math.random() * 200 - 100;
+            object.position.y = 10;
+            object.position.z = Math.random() * 200 - 100;
+
+            object.rotation.x = Math.random() * 2 * Math.PI;
+            object.rotation.y = Math.random() * 2 * Math.PI;
+            object.rotation.z = Math.random() * 2 * Math.PI;
+
+            this.data.modelGroup.push(object);
+
+            scene.add( object );
+        }
         // * 辅助网格
-        const gridHelper = new THREE.GridHelper(10, 25);
+        const gridHelper = new THREE.GridHelper(300, 25);
         scene.add(gridHelper);
         // * 相机
-        const camera = new THREE.PerspectiveCamera(60, 1, 0.01, 100);
+        const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 1000);
         // * 光源
         const ambientLight = new AmbientLight(0xffffff);
         scene.add(ambientLight);
@@ -47,19 +66,41 @@ class Schedule {
         // transformController.attach(tree);
         // scene.add(transformController);
         // * 相机参数设置
-        camera.position.set(8, 8, 8); //设置相机位置
+        camera.position.set(200, 200, 200); //设置相机位置
         camera.lookAt(scene.position);
         camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        camera.updateMatrixWorld();
         // * 选择器
-        const selector = new Selector(camera, scene, []);
+        const selector = new Selector(container,camera, scene, this.data.modelGroup);
         selector.setCallback('mousemove', (results: Intersection[]) => {
-            if (results.length > 0) {
-                console.log(results[0].object);
-                results[0].object.position.x = 0.5
+            if ( results.length > 0 ) {
+
+                if ( this.INTERSECTED != results[ 0 ].object ) {
+
+                    if ( this.INTERSECTED ) this.INTERSECTED.material.emissive.setHex( this.INTERSECTED.currentHex );
+
+                    this.INTERSECTED = results[ 0 ].object;
+                    this.INTERSECTED.currentHex = this.INTERSECTED.material.emissive.getHex();
+                    this.INTERSECTED.material.emissive.setHex( 0xff0000 );
+
+                }
+
+            } else {
+
+                if ( this.INTERSECTED ) this.INTERSECTED.material.emissive.setHex( this.INTERSECTED.currentHex );
+
+                this.INTERSECTED = null;
+
             }
         });
+        selector.setCallback('click',(results: Intersection[])=>{
+            console.log(results)
+
+
+        })
         // * 渲染器参数设置
-        renderer.setSize(800, 800);
+        renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setClearColor(
             options.backgroundColor || 0x333333,
             options.backgroundAlpha !== undefined ? options.backgroundAlpha : 1
@@ -67,6 +108,13 @@ class Schedule {
         // * 插入画布
         container.appendChild(renderer.domElement);
 
+        // 监听窗口尺寸变化，自适应渲染
+        window.onresize = () => {
+            renderer.setSize(container.clientWidth,container.clientHeight);
+            //窗口宽高比
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+        }
         // * 渲染
         function render() {
             renderer.render(scene, camera);
@@ -81,7 +129,9 @@ class Schedule {
         this.data.renderer = renderer;
         this.data.orbitControls = orbitControls;
     }
+    destroy() {
 
+    }
     async file_load(path: string, type: ModelType | string) {
         const loadTask = new Task(TaskType.FILE_LOAD, async (): Promise<Model> => {
             return await this.file.load(path, type)

@@ -3,6 +3,7 @@ class Selector {
   raycaster: Raycaster = new Raycaster();
   position: Vector2 = new Vector2();
   INTERSECTED: Vector2 = new Vector2();
+  container: Element
   camera: Camera | undefined;
   scene: Scene | undefined;
   objects: Object3D [] = [];
@@ -11,30 +12,35 @@ class Selector {
   clickCallback:Function|undefined = undefined;
   /**
    * Creates an instance of Selector.
+   * @param {Element} container
    * @param {THREE.Camera} camera
    * @param {THREE.Scene} scene
    * @param {THREE.Object3D []} objects - 需要查找的对象合集
    * @memberof Selector
    */
-  constructor(camera: Camera, scene: Scene, objects: Object3D []) {
+  constructor(container:Element,camera: Camera, scene: Scene, objects: Object3D []) {
+    this.container = container;
     this.camera = camera;
     this.scene = scene;
     this.objects = objects;
     this.init();
   }
   mouseEventPositionHandler(event: MouseEvent) {
+    console.log(event)
     // 世界坐标转成屏幕坐标
-    this.position.x = (event.clientX / window.innerWidth) * 2 - 1;
-    this.position.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // @ts-ignore
+    this.position.x = ((event.clientX-this.container.offsetLeft) / this.container.clientWidth) * 2 - 1;
+    // @ts-ignore
+    this.position.y = -((event.clientY-this.container.offsetTop) / this.container.clientHeight) * 2 + 1;
     if (!this.camera || !this.scene) {
       return;
     }
     this.raycaster.setFromCamera(this.position, this.camera);
-    return this.raycaster.intersectObjects(this.objects);
+    return this.raycaster.intersectObjects(this.objects,false);
   }
   clickHandler(event: MouseEvent) {
-    const intersects = this.mouseEventPositionHandler(event);
-    if(this.clickCallback) this.clickCallback(intersects);
+    // const intersects = this.mouseEventPositionHandler(event);
+    // if(this.clickCallback) this.clickCallback(intersects);
   }
   mousemoveHandler(event: MouseEvent) {
     const intersects = this.mouseEventPositionHandler(event);
@@ -45,8 +51,7 @@ class Selector {
     document.addEventListener("click", (event)=>{this.clickHandler(event)});
   }
   destroy() {
-    document.removeEventListener('click',this.clickHandler);
-    document.removeEventListener('mousemove',this.mousemoveHandler);
+
   }
   /**
    * 设置查询的回调函数

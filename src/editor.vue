@@ -20,6 +20,7 @@
 <script lang="ts">
 import {defineComponent, onMounted} from "vue";
 import Editor from "./Editor/index"
+import * as THREE from "three";
 
 export default defineComponent({
   props: {
@@ -36,15 +37,28 @@ export default defineComponent({
       const tree = await editor.file.load('/models/tree.obj', 'obj');
       const vtk = await editor.file.load('/models/liver.vtk', 'vtk');
       const tokyo = await editor.file.load('/models/LittlestTokyo.glb', 'gltf');
+      tree.self.scale.set(30,30,30);
+      tree.self.position.set(100,0,100);
       vtk.self.scale.multiplyScalar(0.01);
       tokyo.self.position.set(-5,0,0);
       tokyo.self.scale.set(0.1,0.1,0.1);
       vtk.self.position.set(0,0,-2.5);
+      const geometry = new THREE.BoxGeometry( 20, 20, 20 );
+      for ( let i = 0; i < 10; i ++ ) {
+        const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x000000 } ) );
+        object.position.x = Math.random() * 200 - 100;
+        object.position.y = 10;
+        object.position.z = Math.random() * 200 - 100;
+        object.rotation.x = Math.random() * 2 * Math.PI;
+        object.rotation.y = Math.random() * 2 * Math.PI;
+        object.rotation.z = Math.random() * 2 * Math.PI;
+        editor.model.add(object);
+      }
       editor.model.add(tree.self);
       editor.model.add(vtk.self);
       editor.model.add(tokyo.self);
       setTimeout(() => {
-        editor.model.remove(tree.self);
+        editor.view.toX();
       }, 2000)
       window.editor = editor;
     });

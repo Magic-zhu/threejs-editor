@@ -26,7 +26,6 @@ class Selector {
     this.init();
   }
   mouseEventPositionHandler(event: MouseEvent) {
-    console.log(event)
     // 世界坐标转成屏幕坐标
     // @ts-ignore
     this.position.x = ((event.clientX-this.container.offsetLeft) / this.container.clientWidth) * 2 - 1;
@@ -39,12 +38,16 @@ class Selector {
     return this.raycaster.intersectObjects(this.objects,false);
   }
   clickHandler(event: MouseEvent) {
-    // const intersects = this.mouseEventPositionHandler(event);
-    // if(this.clickCallback) this.clickCallback(intersects);
+    if(this.clickCallback) {
+      const intersects = this.mouseEventPositionHandler(event);
+      if(this.clickCallback) this.clickCallback(intersects);
+    }
   }
   mousemoveHandler(event: MouseEvent) {
-    const intersects = this.mouseEventPositionHandler(event);
-    if(this.mouseMoveCallback) this.mouseMoveCallback(intersects);
+    if(this.mouseMoveCallback){
+      const intersects = this.mouseEventPositionHandler(event);
+      this.mouseMoveCallback(intersects);
+    }
   }
   init() {
     document.addEventListener("mousemove", (event)=>{this.mousemoveHandler(event)});

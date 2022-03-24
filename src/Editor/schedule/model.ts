@@ -49,7 +49,6 @@ class Model {
                     loader.setDRACOLoader(dracoLoader);
                     loader.load(_path,(gltf:any)=>{
                         const model = gltf.scene;
-                        console.log('啦啦啦啦',model);
                         model.position.set( 0, 0, 0 );
                         this.self = model;
                         this.uuid = model.uuid;

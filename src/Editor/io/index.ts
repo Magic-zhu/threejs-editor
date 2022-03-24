@@ -4,12 +4,12 @@ export interface EventTarget {
 }
 class IO {
   // _proto_ no need
-  static _events: any = Object.create(null);
-  static MAX_LISTENERS: number = 10;
+  _events: any = Object.create(null);
+  MAX_LISTENERS: number = 10;
 
   constructor() {}
 
-  static on(eventName: string, listener: Function, options: any = {}) {
+  on(eventName: string, listener: Function, options: any = {}) {
     if (eventName === undefined || listener === undefined) {
       console.error("event or listener is required!");
       return;
@@ -30,7 +30,7 @@ class IO {
     });
   }
 
-  static emit(eventName: string, ...args: any) {
+  emit(eventName: string, ...args: any) {
     if (!(eventName in this._events)) {
       return false;
     }
@@ -48,15 +48,15 @@ class IO {
     }
   }
 
-  static once(eventName: string, listener: Function) {
+  once(eventName: string, listener: Function) {
     this.on(eventName, listener, { once: true });
   }
 
-  static off(eventName: string, listener: Function) {
+  off(eventName: string, listener: Function) {
     this.removeListener(eventName, listener);
   }
 
-  static removeListener(eventName: string, listener: Function) {
+  removeListener(eventName: string, listener: Function) {
     if (!(eventName in this._events)) {
       console.warn(`there is no event named ${eventName}`);
       return false;
@@ -76,7 +76,7 @@ class IO {
     }
   }
 
-  static removeAllListener(eventName: string) {
+  removeAllListener(eventName: string) {
     if (this._events[eventName] === undefined) {
       console.warn(`there is no event named ${eventName}`);
       return false;
@@ -85,7 +85,7 @@ class IO {
     this._events[eventName] = [];
   }
 
-  static setMaxListeners(num: number) {
+  setMaxListeners(num: number) {
     this.MAX_LISTENERS = num;
   }
 }

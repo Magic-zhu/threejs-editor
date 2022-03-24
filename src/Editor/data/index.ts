@@ -1,5 +1,7 @@
 import {Scene, GridHelper, PerspectiveCamera, WebGLRenderer, Object3D} from 'three'
 import {OrbitControls} from '@three-ts/orbit-controls'
+import {TransformControls} from 'three/examples/jsm/controls/TransformControls'
+
 //@ts-ignore
 import chalk from 'chalk-web';
 
@@ -9,8 +11,9 @@ class Store {
     camera?: PerspectiveCamera
     renderer?: WebGLRenderer
     orbitControls?: OrbitControls
+    transformController?: TransformControls
     modelGroup: Object3D [] = new Proxy([], this.dataOnChange())
-
+    options:any = new Proxy({},this.dataOnChange())
     constructor() {
 
     }
@@ -27,7 +30,7 @@ class Store {
                     'camera',
                     'renderer',
                     'orbitControls',
-                ].includes(prop)) {
+                ].includes(prop) && this.options.dataOnChange) {
                     chalk('green', `[data change]:${prop}`, value)
                     console.log(target)
                 }

@@ -3,6 +3,7 @@ export enum TaskType {
     'FILE_LOAD' = 'file_load',
     'MODEL_ADD' = 'model_add',
     'MODEL_REMOVE' = 'model_remove',
+    'VIEW_CHANGE' = 'view_change',
 }
 export enum TaskStatus {
     // 就绪

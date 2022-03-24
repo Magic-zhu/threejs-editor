@@ -13,7 +13,7 @@
       <div class="right-panel"></div>
     </div>
     <div class="status-bar">
-      <div class="version">version {{ version }}</div>
+      <div class="version">Ver{{ version }}</div>
     </div>
   </div>
 </template>
@@ -39,10 +39,10 @@ export default defineComponent({
       const tokyo = await editor.file.load('/models/LittlestTokyo.glb', 'gltf');
       tree.self.scale.set(30,30,30);
       tree.self.position.set(100,0,100);
-      vtk.self.scale.multiplyScalar(0.01);
+      vtk.self.scale.multiplyScalar(0.1);
       tokyo.self.position.set(-5,0,0);
       tokyo.self.scale.set(0.1,0.1,0.1);
-      vtk.self.position.set(0,0,-2.5);
+      vtk.self.position.set(0,0,-100);
       const geometry = new THREE.BoxGeometry( 20, 20, 20 );
       for ( let i = 0; i < 10; i ++ ) {
         const object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x000000 } ) );

@@ -1,28 +1,29 @@
 import { Raycaster, Vector2, Camera, Scene, Object3D } from "three";
+import Store, {SelectMode} from "../data";
 class Selector {
   raycaster: Raycaster = new Raycaster();
   position: Vector2 = new Vector2();
-  INTERSECTED: Vector2 = new Vector2();
   container: Element
   camera: Camera | undefined;
   scene: Scene | undefined;
-  objects: Object3D [] = [];
+  data: Store;
   // * 选取之后的回调
   mouseMoveCallback:Function|undefined = undefined;
   clickCallback:Function|undefined = undefined;
+
   /**
    * Creates an instance of Selector.
    * @param {Element} container
    * @param {THREE.Camera} camera
    * @param {THREE.Scene} scene
-   * @param {THREE.Object3D []} objects - 需要查找的对象合集
+   * @param {Store} data
    * @memberof Selector
    */
-  constructor(container:Element,camera: Camera, scene: Scene, objects: Object3D []) {
+  constructor(container:Element,camera: Camera, scene: Scene, data: Store,) {
     this.container = container;
     this.camera = camera;
     this.scene = scene;
-    this.objects = objects;
+    this.data = data;
     this.init();
   }
   mouseEventPositionHandler(event: MouseEvent) {
@@ -35,7 +36,8 @@ class Selector {
       return;
     }
     this.raycaster.setFromCamera(this.position, this.camera);
-    return this.raycaster.intersectObjects(this.objects,false);
+    const recursive = this.data.selectMode !== SelectMode.SIMPLE;
+    return this.raycaster.intersectObjects(this.data.modelGroup,recursive);
   }
   clickHandler(event: MouseEvent) {
     if(this.clickCallback) {

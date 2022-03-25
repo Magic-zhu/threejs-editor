@@ -1,9 +1,12 @@
 import {Ran32} from '../util';
+import IO from "../io";
 export enum TaskType {
     'FILE_LOAD' = 'file_load',
     'MODEL_ADD' = 'model_add',
     'MODEL_REMOVE' = 'model_remove',
     'VIEW_CHANGE' = 'view_change',
+    'SELECTOR_MODE_CHANGE' = 'selector_mode_change',
+    'MODEL_GET' = 'model_get',
 }
 export enum TaskStatus {
     // 就绪
@@ -33,6 +36,8 @@ class Task{
     type?:TaskType
     // 任务状态
     status:TaskStatus = TaskStatus.READY
+    // 保持任务不被销毁
+    keepAlive:boolean = false
     // 任务内容
     content?:Function
 
@@ -48,9 +53,9 @@ class Task{
         if(this.content){
             try {
                 this.payload.result = await this.content();
-                this.exit();
+                this.exit(1);
             }catch(err){
-                this.exit(err);
+                this.exit(1,err);
             }
         }
     }
@@ -63,17 +68,29 @@ class Task{
                 this.payload.result = this.content();
                 this.exit();
             }catch(err){
-                this.exit(err);
+                this.exit(0,err);
             }
         }
     }
-
-    exit(err?:any){
+    
+    /**
+     *
+     * @description 任务退出
+     * @param {number} [async=0] - 是否异步任务
+     * @param {*} [err] - 错误信息
+     * @memberof Task
+     */
+    exit(async:number = 0, err?:any){
         this.finishTime = new Date().getTime();
         if (err) {
             this.status = TaskStatus.ERROR;
+            this.payload.error = err;
         }else{
             this.status = TaskStatus.FINISHED;
+        }
+        // @ 触发退出事件
+        if(async===1){
+            IO.emit('task_exit',this.pid);
         }
     }
 }

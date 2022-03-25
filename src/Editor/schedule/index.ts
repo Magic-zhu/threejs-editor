@@ -1,13 +1,13 @@
 //@ts-ignore
 import * as THREE from "three";
-import {Color, Intersection, Object3D, AmbientLight} from "three";
+import {AmbientLight, Color, Intersection, Object3D} from "three";
 import {OrbitControls} from "@three-ts/orbit-controls";
 import Loader, {ModelType} from "./loader";
 import Selector from "./selector";
-import Store from "../data/";
-import Task, {TaskType} from "./task";
+import Store, {SelectMode} from "../data/";
+import Task, {TaskStatus, TaskType} from "./task";
 import Model from './model'
-import {findIndex} from '../util'
+import {findIndex, findUntilParentScene, throttle} from '../util'
 import {TransformControls} from 'three/examples/jsm/controls/TransformControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
 import IO from '../io/index'
@@ -30,18 +30,31 @@ class Schedule {
     // 文件加载器
     file = new Loader();
     // 任务队列
-    taskQueue: Task[] = [];
+    taskQueue: Task[] = new Proxy([],{});
     // 当前操作对象
     INTERSECTED: any = undefined;
-    // 发布订阅
-    io:IO = new IO();
 
     init(container: Element, options: Options = {}) {
+        // * 监听任务完成
+        IO.on('task_exit',throttle((pid:string)=>{
+            // todo 暂时靠脏检查释放任务
+            const len = this.taskQueue.length;
+            if(len>=20){
+                for(let i = 0;i<len;i++){
+                    if(this.taskQueue[i]===undefined) break
+                    if(this.taskQueue[i].status===TaskStatus.FINISHED){
+                        this.taskQueue.splice(i,1);
+                        i--;
+                    }
+                }
+            }
+        },4000))
         // * 设置配置表
         this.data.options = {...options};
         // @ts-ignore
         // * 性能监控插件
         const stats:Stats = new Stats();
+        stats.setMode(2);
         if(options.fps){
             container.appendChild(stats.dom)
         }
@@ -72,19 +85,21 @@ class Schedule {
         camera.updateProjectionMatrix();
         camera.updateMatrixWorld();
         // * 选择器
-        const selector = new Selector(container, camera, scene, this.data.modelGroup);
+        const selector = new Selector(container, camera, scene, this.data);
         // @ 注册鼠标移动事件
         selector.setCallback('mousemove', (results: Intersection[]) => {
-            this.io.emit('mousemove',results)
+            IO.emit('mousemove',results)
         });
         // @ 注册鼠标单击事件
         selector.setCallback('click', (results: Intersection[]) => {
             if (results.length > 0) {
-                if (this.INTERSECTED != results[0].object) {
+                const target = this.data.selectMode === SelectMode.GROUP?
+                    findUntilParentScene(results[0].object):results[0].object;
+                if (this.INTERSECTED != target) {
                     if (this.INTERSECTED) {
                         transformController.detach();
                     }
-                    this.INTERSECTED = results[0].object;
+                    this.INTERSECTED = target;
                     transformController.attach(this.INTERSECTED);
                 }
             } else {
@@ -149,7 +164,6 @@ class Schedule {
             return 'success'
         });
         modelAddTask.doSync();
-        this.taskQueue.push(modelAddTask);
     }
 
     model_remove(obj: Object3D) {
@@ -160,7 +174,13 @@ class Schedule {
             return 'success'
         });
         modelRemoveTask.doSync();
-        this.taskQueue.push(modelRemoveTask);
+    }
+
+    model_get_all() {
+        const task = new Task(TaskType.MODEL_GET, () => {
+            return this.data.modelGroup
+        });
+        task.doSync();
     }
 
     view_change(x:number,y:number,z:number) {
@@ -172,7 +192,14 @@ class Schedule {
             return 'success'
         });
         viewChangeTask.doSync();
-        this.taskQueue.push(viewChangeTask);
+    }
+
+    selector_mode_set(mode:SelectMode) {
+        const task = new Task(TaskType.SELECTOR_MODE_CHANGE, () => {
+            this.data.selectMode = mode;
+            return 'success'
+        });
+        task.doSync();
     }
 }
 

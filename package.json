@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typedoc": "typedoc --options typedoc.json",
+    "docs": "docsify serve ./docs"
   },
   "dependencies": {
     "@three-ts/orbit-controls": "^1.4.7",
@@ -16,7 +18,9 @@
   "devDependencies": {
     "@types/three": "^0.138.0",
     "@vitejs/plugin-vue": "^2.2.0",
+    "docsify": "^4.12.2",
     "less": "^4.1.2",
+    "typedoc": "^0.22.13",
     "typescript": "^4.5.4",
     "vite": "^2.8.0",
     "vue-tsc": "^0.29.8"

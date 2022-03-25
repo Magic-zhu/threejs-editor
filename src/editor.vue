@@ -33,7 +33,7 @@ export default defineComponent({
   setup() {
     onMounted(async () => {
       const content: Element = document.getElementsByClassName("content")[0];
-      const editor = new Editor(content);
+      const editor = new Editor(content,{fps:true});
       const tree = await editor.file.load('/models/tree.obj', 'obj');
       const vtk = await editor.file.load('/models/liver.vtk', 'vtk');
       const tokyo = await editor.file.load('/models/LittlestTokyo.glb', 'gltf');
@@ -57,9 +57,9 @@ export default defineComponent({
       editor.model.add(tree.self);
       editor.model.add(vtk.self);
       editor.model.add(tokyo.self);
-      setTimeout(() => {
-        editor.view.toX();
-      }, 2000)
+      // setTimeout(() => {
+      //   editor.view.toX();
+      // }, 2000)
       window.editor = editor;
     });
     return {

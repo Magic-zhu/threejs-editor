@@ -19,28 +19,41 @@ export const findIndex = (target: any, targetGroup: any [], key: any): number =>
     return -1
 }
 
-export  const  findUntilParentScene = (target:Object3D):Object3D|undefined => {
-    let r:Object3D|undefined
-    function find(t:Object3D) {
-        if(t.parent && t.parent.type!=='Scene'){
+export const findUntilParentScene = (target: Object3D): Object3D | undefined => {
+    let r: Object3D | undefined
+
+    function find(t: Object3D) {
+        if (t.parent && t.parent.type !== 'Scene') {
             find(t.parent)
-        }else{
+        } else {
             r = t
         }
     }
+
     find(target)
     return r
 }
 
-export const throttle = (func:Function,wait:number) => {
-    let timer:number|null = null
-    return function (args:any) {
-        if(timer){
+export const throttle = (func: Function, wait: number) => {
+    let timer: NodeJS.Timeout | null = null
+    return function (...args: any) {
+        if (timer) {
             clearTimeout(timer)
         }
-        console.log('出发了节流')
-        timer = setTimeout(()=>{
+        timer = setTimeout(() => {
             func(...args);
-        },wait)
+        }, wait)
     }
+}
+
+export const chalk = (css: any, string: string, data = '') => {
+    let cssString = '';
+    if (typeof css == 'string') {
+        cssString = 'color:' + css;
+    } else {
+        for (let key in css) {
+            cssString = cssString + key + ':' + css[key] + ';'
+        }
+    }
+    return console.log('%c' + string, cssString, data)
 }

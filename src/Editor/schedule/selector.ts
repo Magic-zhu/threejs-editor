@@ -10,12 +10,14 @@ class Selector {
   // * 选取之后的回调
   mouseMoveCallback:Function|undefined = undefined;
   clickCallback:Function|undefined = undefined;
-
+  // * listener
+  mousemoveListener:any = undefined;
+  clickListener:any = undefined;
   /**
    * Creates an instance of Selector.
    * @param {Element} container
-   * @param {THREE.Camera} camera
-   * @param {THREE.Scene} scene
+   * @param {Camera} camera
+   * @param {Scene} scene
    * @param {Store} data
    * @memberof Selector
    */
@@ -52,11 +54,14 @@ class Selector {
     }
   }
   init() {
-    document.addEventListener("mousemove", (event)=>{this.mousemoveHandler(event)});
-    document.addEventListener("click", (event)=>{this.clickHandler(event)});
+    this.mousemoveListener = (event:MouseEvent)=>{this.mousemoveHandler(event)};
+    this.clickListener = (event:MouseEvent)=>{this.clickHandler(event)};
+    document.addEventListener("mousemove", this.mousemoveListener);
+    document.addEventListener("click", this.clickListener);
   }
   destroy() {
-
+    document.removeEventListener("mousemove", this.mousemoveListener);
+    document.removeEventListener("click", this.clickListener);
   }
   /**
    * 设置查询的回调函数

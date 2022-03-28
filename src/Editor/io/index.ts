@@ -88,5 +88,9 @@ class IO {
   static setMaxListeners(num: number) {
     this.MAX_LISTENERS = num;
   }
+
+  static clear() {
+    this._events = Object.create(null);
+  }
 }
 export default IO;

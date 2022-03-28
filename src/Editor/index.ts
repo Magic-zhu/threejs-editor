@@ -3,6 +3,7 @@ import {ModelType} from "./schedule/loader";
 import Model from "./schedule/model";
 import {Object3D} from "three";
 import {SelectMode} from "./data";
+import IO from './io'
 
 interface EditorApiFile {
     load: Function,
@@ -21,16 +22,21 @@ interface EditorApiView {
     toZ: Function,
     changeView: Function,
 }
-
 interface EditorAPiSelect {
     setMode:Function,
+}
+
+interface Plugin {
+    install:Function,
+    installed:boolean,
+    name:string,
 }
 
 class Editor {
     container: Element;
     schedule: Schedule = new Schedule();
 
-    plugins:[] = []
+    plugins:any = {}
 
     file: EditorApiFile = {
         load: this.loadFile.bind(this),
@@ -39,7 +45,7 @@ class Editor {
     model: EditorApiModel = {
         add: this.addModel.bind(this),
         remove: this.removeModel.bind(this),
-        get:this.getAllModel.bind(this),
+        get:this.getModel.bind(this),
         getAll:this.getAllModel.bind(this),
     }
 
@@ -63,8 +69,15 @@ class Editor {
         this.init(container, options);
     }
 
-    use() {
+    use(plugin:Plugin) {
+        if(plugin && plugin.install && !plugin.installed){
+            plugin.install(IO);
+        }
+    }
 
+    // @ 主要是用来移除监听
+    destroy() {
+        this.schedule.destroy()
     }
 
     private init(container: Element, options: Options) {
@@ -83,9 +96,8 @@ class Editor {
         this.schedule.model_remove(obj);
     }
 
-    private getModel() {
-        // TODO
-        this.schedule.model_get_all();
+    private getModel(id:string) {
+        this.schedule.model_get(id);
     }
 
     private getAllModel() {

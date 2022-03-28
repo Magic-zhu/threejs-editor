@@ -18,9 +18,10 @@
   </div>
 </template>
 <script lang="ts">
-import {defineComponent, onMounted} from "vue";
+import {defineComponent, onMounted, onUnmounted} from "vue";
 import Editor from "./Editor/index"
 import * as THREE from "three";
+import Cache from './plugins/Cache'
 
 export default defineComponent({
   props: {
@@ -31,9 +32,12 @@ export default defineComponent({
     },
   },
   setup() {
+    let editor:Editor;
     onMounted(async () => {
+      console.log('onMounted')
       const content: Element = document.getElementsByClassName("content")[0];
-      const editor = new Editor(content,{fps:true});
+      editor = new Editor(content,{fps:true});
+      editor.use(new Cache());
       const tree = await editor.file.load('/models/tree.obj', 'obj');
       const vtk = await editor.file.load('/models/liver.vtk', 'vtk');
       const tokyo = await editor.file.load('/models/LittlestTokyo.glb', 'gltf');
@@ -61,6 +65,10 @@ export default defineComponent({
       //   editor.view.toX();
       // }, 2000)
       window.editor = editor;
+    });
+    onUnmounted(()=>{
+      console.log('onUnmounted')
+      editor.destroy();
     });
     return {
       version: "1.0.0",

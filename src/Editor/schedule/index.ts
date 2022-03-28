@@ -1,7 +1,7 @@
 //@ts-ignore
 import * as THREE from "three";
 import {AmbientLight, Color, Intersection, Object3D} from "three";
-import {OrbitControls} from "@three-ts/orbit-controls";
+import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
 import Loader, {ModelType} from "./loader";
 import Selector from "./selector";
 import Store, {SelectMode} from "../data/";
@@ -19,8 +19,11 @@ export interface Options {
     backgroundAlpha?: number
     // 是否显示性能监控
     fps?:boolean
+    // 性能监控初始化类型
+    statsMode?: number
     // 是否打印数据变化
     dataChange?:boolean
+
 }
 
 class Schedule {
@@ -33,10 +36,12 @@ class Schedule {
     taskQueue: Task[] = new Proxy([],{});
     // 当前操作对象
     INTERSECTED: any = undefined;
+    // 发布订阅
+    io = IO;
 
     init(container: Element, options: Options = {}) {
         // * 监听任务完成
-        IO.on('task_exit',throttle((pid:string)=>{
+        IO.on('task_exit',throttle(()=>{
             // todo 暂时靠脏检查释放任务
             const len = this.taskQueue.length;
             if(len>=20){
@@ -54,7 +59,11 @@ class Schedule {
         // @ts-ignore
         // * 性能监控插件
         const stats:Stats = new Stats();
-        stats.setMode(2);
+        if(options.statsMode===undefined){
+            stats.setMode(2);
+        }else{
+            stats.setMode(options.statsMode);
+        }
         if(options.fps){
             container.appendChild(stats.dom)
         }
@@ -142,10 +151,12 @@ class Schedule {
         this.data.renderer = renderer;
         this.data.orbitControls = orbitControls;
         this.data.transformController = transformController;
+        this.data.selector = selector;
     }
 
     destroy() {
-
+        this.data.selector?.destroy();
+        IO.clear();
     }
 
     async file_load(path: string, type: ModelType | string) {
@@ -174,6 +185,14 @@ class Schedule {
             return 'success'
         });
         modelRemoveTask.doSync();
+    }
+
+    model_get(id:string) {
+        const task = new Task(TaskType.MODEL_GET, () => {
+            const index = findIndex({uuid:id},this.data.modelGroup,'uuid')
+            return this.data.modelGroup[index]
+        });
+        task.doSync();
     }
 
     model_get_all() {

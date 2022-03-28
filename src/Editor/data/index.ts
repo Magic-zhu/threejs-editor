@@ -1,9 +1,8 @@
 import {Scene, GridHelper, PerspectiveCamera, WebGLRenderer, Object3D} from 'three'
-import {OrbitControls} from '@three-ts/orbit-controls'
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import {TransformControls} from 'three/examples/jsm/controls/TransformControls'
-
-//@ts-ignore
-import chalk from 'chalk-web';
+import {chalk} from '../util'
+import Selector from "../schedule/selector";
 
 export enum SelectMode {
     'GROUP' = 'group', // 可以选中group
@@ -21,6 +20,7 @@ class Store {
     modelGroup: Object3D [] = new Proxy([], this.dataOnChange())
     options:any = new Proxy({},this.dataOnChange())
     selectMode:string = SelectMode.GROUP
+    selector?:Selector
     constructor() {
 
     }
@@ -37,6 +37,7 @@ class Store {
                     'camera',
                     'renderer',
                     'orbitControls',
+                    'selector',
                 ].includes(prop) && this.options.dataOnChange) {
                     chalk('green', `[data change]:${prop}`, value)
                     console.log(target)

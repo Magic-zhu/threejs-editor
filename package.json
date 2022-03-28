@@ -7,11 +7,11 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "typedoc": "typedoc --options typedoc.json",
-    "docs": "docsify serve ./docs"
+    "docs": "docsify serve ./docs",
+    "build:editor": "rollup --config"
   },
   "dependencies": {
-    "@three-ts/orbit-controls": "^1.4.7",
-    "chalk-web": "^1.0.0",
+    "localforage": "^1.10.0",
     "three": "^0.138.3",
     "vue": "^3.2.25"
   },
@@ -20,6 +20,9 @@
     "@vitejs/plugin-vue": "^2.2.0",
     "docsify": "^4.12.2",
     "less": "^4.1.2",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.31.2",
     "typedoc": "^0.22.13",
     "typescript": "^4.5.4",
     "vite": "^2.8.0",

@@ -1,5 +1,6 @@
 import Loader, {ModelType,loaderMap} from "./loader";
 import {Object3D, MeshLambertMaterial, Mesh, BufferGeometry} from "three";
+import IO from '../io';
 
 export enum ModelStatus {
     'READY' = 0,
@@ -27,6 +28,7 @@ class Model {
     async init(path?: string, type?: ModelType|string):Promise<Object3D> {
         let _path:string = path || this.path;
         let _type:string = type || this.type;
+        IO.emit('model_load');
         const loader = new loaderMap[_type]();
         return new Promise((resolve => {
             switch (_type){

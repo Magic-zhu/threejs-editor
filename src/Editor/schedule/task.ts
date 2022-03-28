@@ -41,6 +41,12 @@ class Task{
     // 任务内容
     content?:Function
 
+    /**
+     *
+     * @param {TaskType} type - 任务类型
+     * @param {Function} content - 任务内容
+     * @param {} payload - 任务携带的数据
+     */
     constructor(type:TaskType,content:Function,payload:any = {}) {
         this.type = type;
         this.content = content;
@@ -72,7 +78,7 @@ class Task{
             }
         }
     }
-    
+
     /**
      *
      * @description 任务退出

@@ -1,9 +1,10 @@
 import Schedule, {Options} from './schedule/index'
 import {ModelType} from "./schedule/loader";
 import Model from "./schedule/model";
-import {Object3D} from "three";
+import { Object3D } from "three";
 import {SelectMode} from "./data";
 import IO from './io'
+export * from 'three'
 
 interface EditorApiFile {
     load: Function,
@@ -26,6 +27,15 @@ interface EditorAPiSelect {
     setMode:Function,
 }
 
+
+interface EditorApiHook {
+    onUpdated:Function
+}
+
+interface EditorApiAnimation {
+    
+}
+
 interface Plugin {
     install:Function,
     installed:boolean,
@@ -34,9 +44,10 @@ interface Plugin {
 
 class Editor {
     container: Element;
-    schedule: Schedule = new Schedule();
-
     plugins:any = {}
+    
+    private schedule: Schedule = new Schedule();
+
 
     file: EditorApiFile = {
         load: this.loadFile.bind(this),
@@ -60,6 +71,14 @@ class Editor {
         changeView: this.changeView.bind(this),
     }
 
+    animation:EditorApiAnimation = {
+
+    }
+
+    hook:EditorApiHook = {
+        onUpdated:this.setUpdatedCallBack.bind(this)
+    }
+
     selector:EditorAPiSelect = {
         setMode:this.setSelectMode.bind(this)
     }
@@ -69,7 +88,7 @@ class Editor {
         this.init(container, options);
     }
 
-    use(plugin:Plugin) {
+    use(plugin:Plugin|any) {
         if(plugin && plugin.install && !plugin.installed){
             plugin.install(IO);
         }
@@ -79,6 +98,7 @@ class Editor {
     destroy() {
         this.schedule.destroy()
     }
+
 
     private init(container: Element, options: Options) {
         this.schedule.init(container, options);
@@ -110,6 +130,10 @@ class Editor {
 
     private setSelectMode(mode:SelectMode) {
         this.schedule.selector_mode_set(mode);
+    }
+
+    private setUpdatedCallBack(callback:Function) {
+        this.schedule.onUpdate = callback
     }
 }
 

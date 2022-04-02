@@ -8,6 +8,7 @@ export enum SelectMode {
     'GROUP' = 'group', // 可以选中group
     'SINGLE' = 'single', // 选中单个
     'SIMPLE' = 'simple', // 无法选中Group类型 不检查子元素 性能较好
+    'NONE' = 'none', // 无法选中
 }
 
 class Store {

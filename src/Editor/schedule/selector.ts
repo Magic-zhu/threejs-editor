@@ -42,7 +42,7 @@ class Selector {
     return this.raycaster.intersectObjects(this.data.modelGroup,recursive);
   }
   clickHandler(event: MouseEvent) {
-    if(this.clickCallback) {
+    if(this.clickCallback && this.data.selectMode!==SelectMode.NONE) {
       const intersects = this.mouseEventPositionHandler(event);
       if(this.clickCallback) this.clickCallback(intersects);
     }

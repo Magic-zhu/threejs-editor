@@ -12,6 +12,8 @@ class Model {
     type:ModelType|string = ModelType.obj;
     uuid:string = '';
     self:Object3D|null = null;
+    // info 完整的数据
+    origin:Object3D|null = null;
     // 文件路径
     path:string = '';
     // 模型加载进度
@@ -55,6 +57,7 @@ class Model {
                         this.self = model;
                         this.uuid = model.uuid;
                         this.status = ModelStatus.FINISHED;
+                        this.origin = gltf;
                         resolve(model);
                     })
                     break

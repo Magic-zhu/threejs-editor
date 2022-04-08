@@ -13,17 +13,17 @@ export default [
             {
                 file: 'dist/editor-es.min.js',
                 format: 'es',
-                name: 'Editor',
+                name: 'TrEditor',
             },
             {
                 file: 'dist/editor-iife.min.js',
                 format: 'iife',
-                name: 'Editor',
+                name: 'TrEditor',
             },
             {
                 file: 'dist/editor-umd.min.js',
                 format: 'umd',
-                name: 'Editor',
+                name: 'TrEditor',
             },
         ],
     },

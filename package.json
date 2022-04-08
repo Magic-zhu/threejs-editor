@@ -1,7 +1,10 @@
 {
-  "name": "inner",
-  "private": true,
-  "version": "0.0.0",
+  "name": "metaverse-editor",
+  "private": false,
+  "version": "0.0.1",
+  "main":"./dist/editor-umd.min.js",
+  "module": "./dist/editor-es.min.js",
+  "types": "./dist/editor/index.d.ts",
   "scripts": {
     "start": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -15,6 +18,7 @@
     "three": "^0.138.3",
     "vue": "^3.2.25"
   },
+  "files": ["*"],
   "devDependencies": {
     "@types/three": "^0.138.0",
     "@vitejs/plugin-vue": "^2.2.0",

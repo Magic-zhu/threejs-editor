@@ -7,6 +7,7 @@ import {PLYLoader} from 'three/examples/jsm/loaders/PLYLoader.js';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {VTKLoader} from 'three/examples/jsm/loaders/VTKLoader.js';
 import {DRACOLoader} from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { } from 'three/examples/jsm/loaders/3DMLoader'
 import Model from "./model";
 export enum  ModelType{
     'stl'= 'stl',

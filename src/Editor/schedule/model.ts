@@ -47,6 +47,17 @@ class Model {
                         resolve(mesh);
                     })
                     break
+                case 'collada':
+                    loader.load(_path,(collada:any)=>{
+                        const model = collada.scene;
+                        model.position.set( 0, 0, 0 );
+                        this.self = model;
+                        this.uuid = model.uuid;
+                        this.status = ModelStatus.FINISHED;
+                        this.origin = collada;
+                        resolve(model);
+                    })
+                    break
                 case 'gltf':
                     const dracoLoader = new loaderMap['dracol']();
                     dracoLoader.setDecoderPath( '/libs/draco/gltf/');

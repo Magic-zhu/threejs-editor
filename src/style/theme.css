@@ -1,4 +1,16 @@
 :root {
-    --primary:#409EFF;
+    --primary:#10aeff;
+    --primary-dark:#1485ee;
+    --danger:#FA5151;
+    --warning:#ffc300;
+    --success:#07c160;
+    --success-light:#91d300;
+    --success-light-deep:#95ec69;
+
+    --special:#6467f0;
+
+    --helper:#576b95;
+    --orange:#c87d2f;
+
     --editor-border:#555555;
-} 
+}

@@ -22,6 +22,10 @@ class Store {
     options:any = new Proxy({},this.dataOnChange())
     selectMode:string = SelectMode.GROUP
     selector?:Selector
+    // 复制的对象
+    copyObj?:Object3D
+    // 是否属于开发模式
+    dev:boolean = false
     constructor() {
 
     }
@@ -39,8 +43,9 @@ class Store {
                     'renderer',
                     'orbitControls',
                     'selector',
-                ].includes(prop) && this.options.dataOnChange) {
+                ].includes(prop) && this.options.dataOnChange && this.options.dev) {
                     chalk('green', `[data change]:${prop}`, value)
+                    chalk('blue','target')
                     console.log(target)
                 }
                 return Reflect.set(target, prop, value, receiver);

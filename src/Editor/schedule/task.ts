@@ -7,6 +7,7 @@ export enum TaskType {
     'VIEW_CHANGE' = 'view_change',
     'SELECTOR_MODE_CHANGE' = 'selector_mode_change',
     'MODEL_GET' = 'model_get',
+    'MODEL_COPY' = 'model_copy',
 }
 export enum TaskStatus {
     // 就绪

@@ -264,6 +264,14 @@ class Schedule {
         task.doSync();
     }
 
+    model_copy(obj:Object3D) {
+        const task = new Task(TaskType.MODEL_COPY, () => {
+            this.data.copyObj = obj;
+            return 'success';
+        });
+        task.doSync();
+    }
+
     view_change(x: number, y: number, z: number) {
         const viewChangeTask = new Task(TaskType.VIEW_CHANGE, () => {
             if (this.data.camera && this.data.scene) {

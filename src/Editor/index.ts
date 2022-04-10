@@ -15,6 +15,7 @@ interface EditorApiModel {
     remove: Function,
     get:Function,
     getAll:Function,
+    copy:Function,
 }
 
 interface EditorApiView {
@@ -33,7 +34,7 @@ interface EditorApiHook {
 }
 
 interface EditorApiAnimation {
-    
+
 }
 
 interface Plugin {
@@ -45,7 +46,7 @@ interface Plugin {
 class Editor {
     container: Element;
     plugins:any = {}
-    
+
     private schedule: Schedule = new Schedule();
 
 
@@ -58,6 +59,7 @@ class Editor {
         remove: this.removeModel.bind(this),
         get:this.getModel.bind(this),
         getAll:this.getAllModel.bind(this),
+        copy:this.copyModel.bind(this),
     }
 
     view: EditorApiView = {
@@ -122,6 +124,10 @@ class Editor {
 
     private getAllModel() {
         this.schedule.model_get_all();
+    }
+
+    private copyModel(obj:Object3D) {
+        this.schedule.model_copy(obj);
     }
 
     private changeView(x: number, y: number, z: number) {

@@ -1,9 +1,10 @@
 import Schedule, {Options} from './schedule/index'
 import {ModelType} from "./schedule/loader";
 import Model from "./schedule/model";
-import { Object3D } from "three";
+import {Object3D} from "three";
 import {SelectMode} from "./data";
 import IO from './io'
+
 export * from 'three'
 
 interface EditorApiFile {
@@ -13,9 +14,9 @@ interface EditorApiFile {
 interface EditorApiModel {
     add: Function,
     remove: Function,
-    get:Function,
-    getAll:Function,
-    copy:Function,
+    get: Function,
+    getAll: Function,
+    copy: Function,
 }
 
 interface EditorApiView {
@@ -24,13 +25,14 @@ interface EditorApiView {
     toZ: Function,
     changeView: Function,
 }
+
 interface EditorAPiSelect {
-    setMode:Function,
+    setMode: Function,
 }
 
 
 interface EditorApiHook {
-    onUpdated:Function
+    onUpdated: Function
 }
 
 interface EditorApiAnimation {
@@ -38,14 +40,14 @@ interface EditorApiAnimation {
 }
 
 interface Plugin {
-    install:Function,
-    installed:boolean,
-    name:string,
+    install: Function,
+    installed: boolean,
+    name: string,
 }
 
 class Editor {
     container: Element;
-    plugins:any = {}
+    plugins: any = {}
 
     private schedule: Schedule = new Schedule();
 
@@ -57,9 +59,9 @@ class Editor {
     model: EditorApiModel = {
         add: this.addModel.bind(this),
         remove: this.removeModel.bind(this),
-        get:this.getModel.bind(this),
-        getAll:this.getAllModel.bind(this),
-        copy:this.copyModel.bind(this),
+        get: this.getModel.bind(this),
+        getAll: this.getAllModel.bind(this),
+        copy: this.copyModel.bind(this),
     }
 
     view: EditorApiView = {
@@ -73,16 +75,14 @@ class Editor {
         changeView: this.changeView.bind(this),
     }
 
-    animation:EditorApiAnimation = {
+    animation: EditorApiAnimation = {}
 
+    hook: EditorApiHook = {
+        onUpdated: this.setUpdatedCallBack.bind(this)
     }
 
-    hook:EditorApiHook = {
-        onUpdated:this.setUpdatedCallBack.bind(this)
-    }
-
-    selector:EditorAPiSelect = {
-        setMode:this.setSelectMode.bind(this)
+    selector: EditorAPiSelect = {
+        setMode: this.setSelectMode.bind(this)
     }
 
     constructor(container: Element, options: Options = {}) {
@@ -90,8 +90,8 @@ class Editor {
         this.init(container, options);
     }
 
-    use(plugin:Plugin|any) {
-        if(plugin && plugin.install && !plugin.installed){
+    use(plugin: Plugin | any) {
+        if (plugin && plugin.install && !plugin.installed) {
             plugin.install(IO);
         }
     }
@@ -118,7 +118,7 @@ class Editor {
         this.schedule.model_remove(obj);
     }
 
-    private getModel(id:string) {
+    private getModel(id: string) {
         this.schedule.model_get(id);
     }
 
@@ -126,7 +126,7 @@ class Editor {
         this.schedule.model_get_all();
     }
 
-    private copyModel(obj:Object3D) {
+    private copyModel(obj: Object3D) {
         this.schedule.model_copy(obj);
     }
 
@@ -134,11 +134,11 @@ class Editor {
         this.schedule.view_change(x, y, z);
     }
 
-    private setSelectMode(mode:SelectMode) {
+    private setSelectMode(mode: SelectMode) {
         this.schedule.selector_mode_set(mode);
     }
 
-    private setUpdatedCallBack(callback:Function) {
+    private setUpdatedCallBack(callback: Function) {
         this.schedule.onUpdate = callback
     }
 }

@@ -77,6 +77,6 @@ export default defineComponent({
 </script>
 
 <style scoped lang="less">
-@import "./style/index.less";
 @import "./style/theme.css";
+@import "./style/index.less";
 </style>

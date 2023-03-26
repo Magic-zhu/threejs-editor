@@ -1,0 +1,29 @@
+.resource-manager-wrapper {
+  flex: 1;
+  background-color: var(--panel-bg);
+  border-left: 1px solid #444444;
+  display: flex;
+  .resource-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2px;
+  }
+  .resource {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 98%;
+      height: 98%;
+    }
+    &:hover {
+      border: 1px solid var(--primary);
+    }
+  }
+}

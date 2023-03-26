@@ -17,6 +17,8 @@ import {
   RectAreaLight,
   SpotLight,
   Vector3,
+  ACESFilmicToneMapping,
+  MathUtils,
 } from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js"
@@ -29,6 +31,7 @@ import { findIndex, findUntilParentScene, throttle } from "../util"
 import { TransformControls } from "three/examples/jsm/controls/TransformControls"
 import Stats from "three/examples/jsm/libs/stats.module"
 import IO from "../io/index"
+import { Sky } from "three/examples/jsm/objects/Sky"
 
 export interface Options {
   // 编辑器背景颜色
@@ -52,6 +55,8 @@ export interface Options {
   enableLinearOutPutEncode?: boolean
   // 内存缓存
   cache?: boolean
+  // 天空
+  sky?: boolean
 }
 export enum LightType {
   "POINT" = "point",
@@ -123,8 +128,14 @@ class Schedule {
       options.cameraFov || 50,
       options.cameraAspect || 1,
       options.cameraNear || 10,
-      options.cameraFar || 1000
+      options.cameraFar || 10000
     )
+    // * 天空
+    if (options.sky !== false) {
+      const sky = this.initSky()
+      sky.name = "天空"
+      scene.add(sky)
+    }
     // * 渲染器
     const renderer = new WebGLRenderer({ antialias: true })
     // * 视角控制器
@@ -139,7 +150,7 @@ class Schedule {
     })
     scene.add(transformController)
     // * 相机参数设置
-    camera.position.set(200, 200, 200) //设置相机位置
+    camera.position.set(200, 200, 500) //设置相机位置
     camera.lookAt(scene.position)
     camera.aspect = container.clientWidth / container.clientHeight
     camera.updateProjectionMatrix()
@@ -170,12 +181,18 @@ class Schedule {
         this.INTERSECTED = null
       }
     })
+
     // * 渲染器参数设置
     renderer.setSize(container.clientWidth, container.clientHeight)
     renderer.setClearColor(
       options.backgroundColor || 0x333333,
       options.backgroundAlpha !== undefined ? options.backgroundAlpha : 1
     )
+
+    // * 天空相关太阳参数 */
+    renderer.toneMapping = ACESFilmicToneMapping
+    renderer.toneMappingExposure = 0.5
+
     // ! 默认启用人类感知色彩空间
     if (!options.enableLinearOutPutEncode) {
       renderer.outputEncoding = sRGBEncoding
@@ -231,6 +248,31 @@ class Schedule {
     this.data.orbitControls?.dispose()
     this.data.transformController?.dispose()
     IO.clear()
+  }
+
+  initSky() {
+    const sky = new Sky()
+    const sun = new Vector3()
+    const effectController = {
+      turbidity: 10,
+      rayleigh: 3,
+      mieCoefficient: 0.005,
+      mieDirectionalG: 0.7,
+      elevation: 2,
+      azimuth: 180,
+    }
+    sky.scale.setScalar(450000)
+    const uniforms = sky.material.uniforms
+    uniforms["turbidity"].value = effectController.turbidity
+    uniforms["rayleigh"].value = effectController.rayleigh
+    uniforms["mieCoefficient"].value = effectController.mieCoefficient
+    uniforms["mieDirectionalG"].value = effectController.mieDirectionalG
+
+    const phi = MathUtils.degToRad(90 - effectController.elevation)
+    const theta = MathUtils.degToRad(effectController.azimuth)
+    sun.setFromSphericalCoords(1, phi, theta)
+    uniforms["sunPosition"].value.copy(sun)
+    return sky
   }
 
   getAllObjects(): Object3D[] {

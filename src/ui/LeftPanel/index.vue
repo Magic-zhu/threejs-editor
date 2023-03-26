@@ -9,9 +9,11 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import SideBar from "./SideBar.vue"
+import ResourceManager from "./ResourceManager.vue"
 export default defineComponent({
   components: {
     SideBar,
+    ResourceManager,
   },
   setup() {
     return {}

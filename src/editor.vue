@@ -2,12 +2,14 @@
   <div id="editor">
     <div class="header"><Menu /></div>
     <div class="body">
-      <div class="left-panel"></div>
+      <div class="left-panel">
+        <LeftPanel></LeftPanel>
+      </div>
       <div class="split-line-left"></div>
       <div class="content"></div>
       <div class="split-line-right"></div>
       <div class="right-panel">
-        <Explorer />
+        <Explorer :list="sceneList" />
       </div>
     </div>
     <div class="status-bar">
@@ -21,6 +23,9 @@ import Editor, { Vector3 } from "./Editor/index"
 import Cache from "./plugins/Cache"
 import Explorer from "./ui/explorer/index.vue"
 import Menu from "./ui/menu/index.vue"
+import LeftPanel from "./ui/LeftPanel/index.vue"
+import { Object3D } from "three"
+import { ref } from "vue"
 
 export default defineComponent({
   props: {
@@ -33,9 +38,15 @@ export default defineComponent({
   components: {
     Explorer: Explorer,
     Menu: Menu,
+    LeftPanel,
   },
   setup() {
     let editor: Editor
+    let sceneList = ref<Object3D[]>([])
+    const init = (editor: Editor) => {
+      const objs = editor.getAllObjects()
+      sceneList.value = objs
+    }
     onMounted(async () => {
       console.log("onMounted")
       const content: Element = document.getElementsByClassName("content")[0]
@@ -51,6 +62,7 @@ export default defineComponent({
       editor.model.add(worker2.self)
       editor.model.add(worker3.self)
       editor.hook.onUpdated(() => {})
+      init(editor)
     })
     onUnmounted(() => {
       console.log("onUnmounted")
@@ -58,6 +70,7 @@ export default defineComponent({
     })
     return {
       version: "1.0.0",
+      sceneList,
     }
   },
 })

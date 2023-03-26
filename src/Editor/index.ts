@@ -156,6 +156,10 @@ class Editor {
   private addLight(type: LightType, pos: Vector3) {
     this.schedule.light_add(type, pos)
   }
+
+  public getAllObjects(): Object3D[] {
+    return this.schedule.getAllObjects()
+  }
 }
 
 export default Editor

@@ -233,6 +233,17 @@ class Schedule {
     IO.clear()
   }
 
+  getAllObjects(): Object3D[] {
+    if (this.data.scene) {
+      return this.data.scene?.children.filter(
+        (child) =>
+          child.uuid !== this.data.transformController?.uuid &&
+          child.uuid !== this.data.gridHelper?.uuid
+      )
+    }
+    return []
+  }
+
   async file_load(path: string, type: ModelType | string) {
     const loadTask = new Task(TaskType.FILE_LOAD, async (): Promise<Model> => {
       return await this.file.load(path, type)
